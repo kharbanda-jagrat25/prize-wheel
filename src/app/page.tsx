@@ -1,94 +1,54 @@
-import Image from 'next/image'
-import styles from './page.module.css'
+"use client";
+import { useState } from 'react';
+import styles from '../styles/Home.module.scss';
 
 export default function Home() {
+  const prizes = ['Prize 1', 'Prize 2', 'Prize 3', 'Prize 4', 'Prize 5', 'Prize 6', 'Prize 7', 'Prize 8', 'Prize 9', 'Prize 10', 'Prize 11', 'Prize 12'];
+  const [name, setName] = useState(styles.circle);
+  const [stoppedIndex, setStoppedIndex] = useState<number | null>(null);
+  const [hasSpinStarted, setSpinStarted] = useState(false);
+
+  const startSpinning = () => {
+    setSpinStarted(true);
+    setStoppedIndex(null);
+    setName(`${styles.circle} ${styles.spin}`);
+    setTimeout(() => {
+      const randomIndex = Math.floor(Math.random() * prizes.length);
+      setStoppedIndex(randomIndex);
+      setName(`${styles.circle} ${styles.spin} ${styles.stopSpin}`);
+      setSpinStarted(false);
+    }, Math.floor(Math.random() * 10000) + 1);
+  }
+
+  const getDegrees = (idx: number) => {
+    return (360 / prizes.length) * idx;
+  }
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <main>
+      <h1 className={styles.heading}>Spin the wheel to win prizes</h1>
+      <ul className={name}>
+        {prizes.map((prize, idx) => (
+          <li
+            key={idx}
+            className={`${styles.listItem} ${stoppedIndex === idx ? styles.stopped : ''}`}
+            style={{
+              transform: `rotate(${getDegrees(idx)}deg) skewY(-60deg)`
+            }}
           >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
+            <div className={styles.text}>{prize}</div>
+          </li>
+        ))}
+      </ul>
       <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
+        <button
+          className={styles.spinBtn}
+          onClick={startSpinning}
+          disabled={hasSpinStarted}
+        >spin the wheel</button>
+        {stoppedIndex !== null && (
+          <div className={styles.result}>Congratulations! You won: <strong>{prizes[stoppedIndex]}</strong></div>
+        )}
       </div>
     </main>
   )
